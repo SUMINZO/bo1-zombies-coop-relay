@@ -47,7 +47,7 @@ export default {
         return json(usage, 200, { ...cors, "cache-control": "public, max-age=60" });
       } catch (error) {
         if (!overQuota(error)) throw error;
-        return json({ fraction: 1, resetsAt: nextUtcMidnight(), estimate: true, overQuota: true }, 200, { ...cors, "cache-control": "public, max-age=60" });
+        return json({ fraction: 1, resetsAt: nextUtcMidnight(), estimate: true, overQuota: true }, 200, { ...cors, "cache-control": "public, max-age=30" });
       }
     }
 
@@ -68,6 +68,7 @@ export default {
     headers.set("x-role", role);
     headers.set("x-guest-id", role === "guest" ? url.searchParams.get("id") ?? "" : "");
     const stub = env.ROOM_RELAY.get(env.ROOM_RELAY.idFromName(`room:${room}`), { locationHint: "apac" });
+    try {
       return await stub.fetch(new Request(request, { headers }));
     } catch (error) {
       if (!overQuota(error)) throw error;
